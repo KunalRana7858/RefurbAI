@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhoneKhoj / SmartRefurb - Shopkeeper & Diagnostic OS</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#0B0F19',
+            'obsidian-card': '#111827',
+            'obsidian-glass': 'rgba(255, 255, 255, 0.04)',
+            'cyber-cyan': '#00F5D4',
+            'azure-blue': '#0066FF',
+            'emerald-pass': '#10B981',
+            'amber-warn': '#F59E0B',
+            'crimson-fail': '#EF4444',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0B0F19;
+      color: #F8FAFC;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 245, 212, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(0, 102, 255, 0.09) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
+    }
+
+    .glass-card {
+      background: rgba(22, 31, 51, 0.65);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.5rem;
+    }
+
+    .glass-border-glow:hover {
+      border-color: rgba(0, 245, 212, 0.4);
+      box-shadow: 0 0 25px rgba(0, 245, 212, 0.15);
+    }
+
+    .neon-gradient-btn {
+      background: linear-gradient(135deg, #00F5D4 0%, #0066FF 100%);
+      color: #0B0F19;
+      font-weight: 700;
+      transition: all 0.25s ease;
+    }
+    .neon-gradient-btn:hover {
+      box-shadow: 0 0 20px rgba(0, 245, 212, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Radar sweep animation */
+    @keyframes radarSweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .radar-beam {
+      animation: radarSweep 2.5s linear infinite;
+      transform-origin: 50% 50%;
+    }
+
+    /* Soundwave bars */
+    @keyframes waveBounce {
+      0%, 100% { height: 8px; }
+      50% { height: 42px; }
+    }
+    .wave-bar {
+      animation: waveBounce 0.8s ease-in-out infinite alternate;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-20">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-white/10 bg-[#0B0F19]/80 backdrop-blur-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyber-cyan to-azure-blue flex items-center justify-center p-[2px]">
+          <div class="w-full h-full bg-obsidian rounded-[10px] flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-5 h-5 text-cyber-cyan"></i>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-extrabold text-lg text-white tracking-tight">PhoneKhoj / SmartRefurb</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/30">SHOP OS PRO</span>
+          </div>
+          <p class="text-xs text-slate-400">Apex Mobile Hub • Connaught Place, New Delhi</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <div class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-cyber-cyan/10 border border-cyber-cyan/20">
+          <span class="w-2 h-2 rounded-full bg-cyber-cyan animate-pulse"></span>
+          <span class="text-xs text-cyber-cyan font-medium">Sanchar Saathi Live Sync</span>
+        </div>
+        <button onclick="switchTab(0)" class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:border-cyber-cyan/40 text-xs font-semibold flex items-center space-x-1.5">
+          <i data-lucide="store" class="w-3.5 h-3.5 text-cyber-cyan"></i>
+          <span>Shop Profile</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <div class="max-w-7xl mx-auto px-4 overflow-x-auto flex space-x-2 py-2">
+      <button onclick="switchTab(0)" id="nav-btn-0" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 bg-gradient-to-r from-cyber-cyan to-azure-blue text-obsidian">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        <span>1. Command Center</span>
+      </button>
+      <button onclick="switchTab(1)" id="nav-btn-1" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 bg-white/5 text-slate-300 hover:text-white">
+        <i data-lucide="activity" class="w-4 h-4 text-cyber-cyan"></i>
+        <span>2. Diagnostic Engine</span>
+      </button>
+      <button onclick="switchTab(2)" id="nav-btn-2" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 bg-white/5 text-slate-300 hover:text-white">
+        <i data-lucide="calculator" class="w-4 h-4 text-azure-blue"></i>
+        <span>3. Valuation & Margin</span>
+      </button>
+      <button onclick="switchTab(3)" id="nav-btn-3" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 bg-white/5 text-slate-300 hover:text-white">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-warn"></i>
+        <span>4. Legal KYC & CEIR</span>
+      </button>
+      <button onclick="switchTab(4)" id="nav-btn-4" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 bg-white/5 text-slate-300 hover:text-white">
+        <i data-lucide="receipt" class="w-4 h-4 text-emerald-pass"></i>
+        <span>5. WhatsApp Invoice</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN TAB CONTAINERS -->
+  <main class="max-w-7xl mx-auto px-4 pt-6">
+
+    <!-- TAB 1: SHOPKEEPER COMMAND CENTER -->
+    <section id="tab-0" class="tab-content space-y-6">
+      <!-- 4 Financial Metric Tiles -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider">Total Stock</span>
+            <i data-lucide="smartphone" class="w-4 h-4 text-cyber-cyan"></i>
+          </div>
+          <div class="text-2xl font-black text-white" id="stat-stock">28 Phones</div>
+          <p class="text-xs text-cyber-cyan mt-1 font-medium">+4 intake today</p>
+        </div>
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider">Capital Invested</span>
+            <i data-lucide="coins" class="w-4 h-4 text-azure-blue"></i>
+          </div>
+          <div class="text-2xl font-black text-white">₹1,85,000</div>
+          <p class="text-xs text-slate-400 mt-1 font-medium">Avg ₹6,607 / unit</p>
+        </div>
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider">Monthly Net Profit</span>
+            <i data-lucide="trending-up" class="w-4 h-4 text-emerald-pass"></i>
+          </div>
+          <div class="text-2xl font-black text-emerald-pass">₹42,300</div>
+          <p class="text-xs text-slate-400 mt-1 font-medium">28.4% profit margin</p>
+        </div>
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between text-slate-400 mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider">Units in Repair</span>
+            <i data-lucide="wrench" class="w-4 h-4 text-amber-warn"></i>
+          </div>
+          <div class="text-2xl font-black text-amber-warn">4 Phones</div>
+          <p class="text-xs text-slate-400 mt-1 font-medium">2 pending parts</p>
+        </div>
+      </div>
+
+      <!-- Live Inventory Controls & Table -->
+      <div class="glass-card p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+              <span>Live Inventory OS</span>
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-pass/20 text-emerald-pass border border-emerald-pass/30">Auto-Synced</span>
+            </h2>
+            <p class="text-xs text-slate-400">Manage real-time inventory, IMEI certificates, and WhatsApp catalog sharing</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="exportInventoryCsv()" class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-cyber-cyan text-xs font-semibold flex items-center space-x-1.5">
+              <i data-lucide="download" class="w-3.5 h-3.5 text-cyber-cyan"></i>
+              <span>Export CSV</span>
+            </button>
+            <button onclick="switchTab(1)" class="neon-gradient-btn px-4 py-2 rounded-xl text-xs flex items-center space-x-1.5">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>+ New Intake Scan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Inventory List Cards -->
+        <div class="space-y-3" id="inventory-list-container">
+          <!-- Dynamic cards injected via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: 2-MINUTE DIAGNOSTIC ENGINE -->
+    <section id="tab-1" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Radar Scan Box -->
+        <div class="glass-card p-6 flex flex-col items-center justify-center text-center">
+          <div class="relative w-44 h-44 rounded-full border border-cyber-cyan/40 bg-[#07101E] flex items-center justify-center mb-4 overflow-hidden">
+            <!-- Concentric rings -->
+            <div class="absolute w-32 h-32 rounded-full border border-cyber-cyan/20"></div>
+            <div class="absolute w-20 h-20 rounded-full border border-cyber-cyan/20"></div>
+            <!-- Radar sweep beam -->
+            <div id="radar-rotator" class="absolute w-full h-full radar-beam">
+              <div class="w-1/2 h-1/2 bg-gradient-to-br from-cyber-cyan/40 to-transparent origin-bottom-right"></div>
+            </div>
+            <!-- Center Shield -->
+            <div class="relative z-10 w-12 h-12 rounded-full bg-obsidian border border-cyber-cyan flex items-center justify-center">
+              <i data-lucide="radar" class="w-6 h-6 text-cyber-cyan"></i>
+            </div>
+          </div>
+          <h3 id="scan-status-text" class="text-sm font-bold text-white mb-1">Radar Diagnostics Idle</h3>
+          <p class="text-xs text-slate-400 mb-4">Simulates RF radio, digitizer, camera & battery bus test</p>
+          <button onclick="runRadarScan()" id="btn-run-scan" class="neon-gradient-btn px-6 py-2.5 rounded-xl text-xs flex items-center space-x-2">
+            <i data-lucide="play" class="w-4 h-4"></i>
+            <span>Run 2-Min Full Scan</span>
+          </button>
+        </div>
+
+        <!-- Touch Grid Module -->
+        <div class="glass-card p-6 lg:col-span-2">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                <i data-lucide="hand" class="w-4 h-4 text-cyber-cyan"></i>
+                <span>Touch & Dead Pixel Test Grid</span>
+              </h3>
+              <p class="text-xs text-slate-400">Swipe or tap blocks to verify responsiveness across display</p>
+            </div>
+            <span id="touch-counter" class="text-xs font-mono font-bold text-cyber-cyan bg-cyber-cyan/10 px-2 py-1 rounded-lg">0 / 48 (0%)</span>
+          </div>
+
+          <!-- Interactive 6x8 touch grid -->
+          <div id="touch-grid" class="grid grid-cols-8 gap-1.5 p-3 rounded-2xl bg-[#090E17] border border-white/10 h-44">
+            <!-- 48 cells rendered in JS -->
+          </div>
+
+          <div class="flex items-center justify-between mt-4">
+            <button onclick="fillTouchGrid()" class="text-xs text-cyber-cyan hover:underline font-semibold">Auto-Pass All Cells</button>
+            <button onclick="resetTouchGrid()" class="text-xs text-slate-400 hover:text-white">Reset Grid</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Camera, Audio, Battery Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Camera & Flash -->
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-white flex items-center space-x-1.5">
+              <i data-lucide="camera" class="w-4 h-4 text-cyber-cyan"></i>
+              <span>Camera & Flash</span>
+            </span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-pass/20 text-emerald-pass">AUTOFOCUS PASS</span>
+          </div>
+          <div id="camera-viewfinder" class="h-32 rounded-xl bg-[#0A1322] border border-white/10 flex flex-col items-center justify-center relative overflow-hidden">
+            <div class="w-14 h-14 rounded-full border-2 border-cyber-cyan border-dashed animate-spin"></div>
+            <span class="text-[10px] text-slate-400 mt-2 font-mono">CMOS 48MP SENSOR OK</span>
+          </div>
+          <div class="flex space-x-2 mt-3">
+            <button onclick="toggleFlash()" class="flex-1 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-semibold text-slate-200 hover:border-cyber-cyan">Test Flash</button>
+            <button onclick="toggleCameraSensor()" class="flex-1 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-semibold text-slate-200 hover:border-cyber-cyan">Switch Front</button>
+          </div>
+        </div>
+
+        <!-- Audio Frequency Visualizer -->
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-white flex items-center space-x-1.5">
+              <i data-lucide="volume-2" class="w-4 h-4 text-azure-blue"></i>
+              <span>Audio & Loopback</span>
+            </span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-pass/20 text-emerald-pass">STEREO PASS</span>
+          </div>
+          <div class="h-32 rounded-xl bg-[#0A1322] border border-white/10 flex items-center justify-center space-x-2 px-6">
+            <div class="w-2 bg-cyber-cyan rounded-full wave-bar" style="animation-delay: 0.1s;"></div>
+            <div class="w-2 bg-azure-blue rounded-full wave-bar" style="animation-delay: 0.3s;"></div>
+            <div class="w-2 bg-cyber-cyan rounded-full wave-bar" style="animation-delay: 0.2s;"></div>
+            <div class="w-2 bg-azure-blue rounded-full wave-bar" style="animation-delay: 0.4s;"></div>
+            <div class="w-2 bg-cyber-cyan rounded-full wave-bar" style="animation-delay: 0.15s;"></div>
+          </div>
+          <button onclick="playBeepTest()" class="w-full mt-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-semibold text-slate-200 hover:border-azure-blue">Play 1kHz Tone Test</button>
+        </div>
+
+        <!-- Battery Health Gauge -->
+        <div class="glass-card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-white flex items-center space-x-1.5">
+              <i data-lucide="battery-charging" class="w-4 h-4 text-emerald-pass"></i>
+              <span>Battery BMS Health</span>
+            </span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-pass/20 text-emerald-pass">88% NORMAL</span>
+          </div>
+          <div class="h-32 rounded-xl bg-[#0A1322] border border-white/10 flex flex-col items-center justify-center">
+            <div class="text-3xl font-black text-cyber-cyan font-mono">88%</div>
+            <span class="text-xs text-slate-400 mt-1">340 Cycles • 31.4°C</span>
+            <span class="text-[10px] text-emerald-pass mt-1 font-semibold">Original OEM Pack</span>
+          </div>
+          <button onclick="syncToValuation()" class="w-full mt-3 neon-gradient-btn py-1.5 rounded-lg text-[11px] font-bold">Transfer to Valuation Engine</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SMART VALUATION & MARGIN ENGINE -->
+    <section id="tab-2" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Selectors and Defect Deduction checklist -->
+        <div class="glass-card p-6 lg:col-span-2 space-y-5">
+          <h2 class="text-base font-bold text-white flex items-center space-x-2">
+            <i data-lucide="calculator" class="w-5 h-5 text-cyber-cyan"></i>
+            <span>Device Model & Defect Checklist</span>
+          </h2>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-slate-400 font-medium block mb-1">Model Selection</label>
+              <select id="val-model-select" onchange="calculateValuation()" class="w-full bg-[#0F172A] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-cyber-cyan outline-none">
+                <option value="38000">iPhone 13 (128GB)</option>
+                <option value="64000">iPhone 14 Pro (256GB)</option>
+                <option value="26000">iPhone 12 (64GB)</option>
+                <option value="68000">Samsung Galaxy S23 Ultra</option>
+                <option value="35000">OnePlus 11 5G</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-slate-400 font-medium block mb-1">Storage Variant</label>
+              <select id="val-storage-select" onchange="calculateValuation()" class="w-full bg-[#0F172A] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-cyber-cyan outline-none">
+                <option value="1.0">128GB (Standard)</option>
+                <option value="1.12">256GB (+12%)</option>
+                <option value="1.25">512GB (+25%)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="border-t border-white/10 pt-4">
+            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Defect Deductions (Auto-Applied)</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer">
+                <span>Display Crack / Scratch</span>
+                <div class="flex items-center space-x-2">
+                  <span class="text-crimson-fail font-mono font-bold">-₹3,500</span>
+                  <input type="checkbox" id="defect-screen" onchange="calculateValuation()" class="rounded accent-cyber-cyan">
+                </div>
+              </label>
+              <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer">
+                <span>Battery Degraded (&lt;80%)</span>
+                <div class="flex items-center space-x-2">
+                  <span class="text-crimson-fail font-mono font-bold">-₹1,200</span>
+                  <input type="checkbox" id="defect-battery" onchange="calculateValuation()" class="rounded accent-cyber-cyan">
+                </div>
+              </label>
+              <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer">
+                <span>Back Glass Crack</span>
+                <div class="flex items-center space-x-2">
+                  <span class="text-crimson-fail font-mono font-bold">-₹700</span>
+                  <input type="checkbox" id="defect-back" onchange="calculateValuation()" class="rounded accent-cyber-cyan">
+                </div>
+              </label>
+              <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer">
+                <span>Missing Box / Charger</span>
+                <div class="flex items-center space-x-2">
+                  <span class="text-crimson-fail font-mono font-bold">-₹500</span>
+                  <input type="checkbox" id="defect-box" checked onchange="calculateValuation()" class="rounded accent-cyber-cyan">
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Valuation Price Output Card -->
+        <div class="glass-card p-6 flex flex-col justify-between border-cyber-cyan/40">
+          <div>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Valuation Summary</h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between text-slate-400">
+                <span>Base Market Value:</span>
+                <span id="out-base-val" class="text-white font-mono font-bold">₹38,000</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Defects Deduction:</span>
+                <span id="out-deductions" class="text-crimson-fail font-mono font-bold">-₹500</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Estimated Resale Price:</span>
+                <span id="out-resale" class="text-cyber-cyan font-mono font-bold">₹37,500</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Repair Overhead:</span>
+                <span id="out-repair" class="text-amber-warn font-mono font-bold">-₹1,800</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Shop Target Profit:</span>
+                <span class="text-emerald-pass font-mono font-bold">-₹3,000</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-white/10">
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-cyber-cyan to-azure-blue text-obsidian text-center">
+              <span class="text-[10px] font-black uppercase tracking-widest block">Recommended Buy Offer</span>
+              <div id="out-buy-offer" class="text-3xl font-black font-mono">₹32,700</div>
+              <span class="text-[10px] font-bold block mt-1">Guarantees ₹3,000 net profit</span>
+            </div>
+
+            <button onclick="switchTab(3)" class="w-full mt-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center justify-center space-x-2">
+              <span>Proceed to Legal KYC</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: LEGAL KYC & FRAUD SHIELD -->
+    <section id="tab-3" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- CEIR & Customer Details -->
+        <div class="glass-card p-6 space-y-4">
+          <h2 class="text-base font-bold text-white flex items-center space-x-2">
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-pass"></i>
+            <span>Sanchar Saathi / CEIR Portal Check</span>
+          </h2>
+
+          <div>
+            <label class="text-xs text-slate-400 font-medium block mb-1">15-Digit Device IMEI</label>
+            <div class="flex space-x-2">
+              <input type="text" id="kyc-imei" value="359284110948201" class="flex-1 bg-[#0F172A] border border-white/10 rounded-xl px-3 py-2 text-sm text-white font-mono focus:border-cyber-cyan outline-none">
+              <button onclick="runCeirCheck()" class="neon-gradient-btn px-4 py-2 rounded-xl text-xs font-bold">Verify CEIR</button>
+            </div>
+          </div>
+
+          <div id="ceir-badge-box" class="p-3 rounded-xl bg-emerald-pass/10 border border-emerald-pass/30 flex items-center space-x-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-pass"></i>
+            <div>
+              <div class="text-xs font-bold text-emerald-pass">CEIR Registry: CLEAN / NOC VERIFIED</div>
+              <div class="text-[10px] text-slate-300">Device not reported stolen/lost in police records.</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div>
+              <label class="text-xs text-slate-400 font-medium block mb-1">Customer Full Name</label>
+              <input type="text" value="Rahul Verma" class="w-full bg-[#0F172A] border border-white/10 rounded-xl px-3 py-2 text-sm text-white outline-none">
+            </div>
+            <div>
+              <label class="text-xs text-slate-400 font-medium block mb-1">Aadhaar Card No.</label>
+              <input type="text" value="5482 9104 2938" class="w-full bg-[#0F172A] border border-white/10 rounded-xl px-3 py-2 text-sm text-white outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Digital Signature Canvas & Selfie -->
+        <div class="glass-card p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-white flex items-center space-x-2">
+              <i data-lucide="pen-tool" class="w-5 h-5 text-cyber-cyan"></i>
+              <span>Customer Signature Pad</span>
+            </h2>
+            <button onclick="clearSignatureCanvas()" class="text-xs text-slate-400 hover:text-white">Clear Pad</button>
+          </div>
+
+          <canvas id="signature-canvas" width="500" height="150" class="w-full h-36 rounded-xl bg-[#070C15] border border-cyber-cyan/30 cursor-crosshair"></canvas>
+
+          <p class="text-[10px] text-slate-400">Draw customer signature above on touch screen. Stamped with GPS & CEIR timestamp.</p>
+
+          <button onclick="switchTab(4)" class="w-full neon-gradient-btn py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2">
+            <span>Complete KYC & Issue WhatsApp Invoice</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: WHATSAPP-READY DIGITAL INVOICE -->
+    <section id="tab-4" class="tab-content hidden space-y-6">
+      <div class="max-w-2xl mx-auto glass-card p-8 border-cyber-cyan/30 space-y-6">
+        <!-- Invoice Header -->
+        <div class="flex justify-between items-start border-b border-white/10 pb-4">
+          <div>
+            <h2 class="text-xl font-black text-white">Apex Mobile Hub</h2>
+            <p class="text-xs text-slate-400">Shop #12, Electronics Mall, Connaught Place, New Delhi</p>
+            <p class="text-[10px] text-slate-500">GSTIN: 07AAAAA1234F1Z9 • PhoneKhoj Certified Shop</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-mono font-bold text-cyber-cyan block">#PK-2026-9042</span>
+            <span class="text-[10px] text-slate-400">28-Sep-2026, 08:35 PM</span>
+          </div>
+        </div>
+
+        <!-- Device & Customer Info -->
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <span class="text-slate-500 font-bold uppercase tracking-wider block">Customer</span>
+            <span class="font-bold text-white text-sm block">Rahul Verma</span>
+            <span class="text-slate-400">+91 98110 98765</span>
+          </div>
+          <div>
+            <span class="text-slate-500 font-bold uppercase tracking-wider block">Device Details</span>
+            <span class="font-bold text-white text-sm block">iPhone 14 Pro (256GB)</span>
+            <span class="text-cyber-cyan font-mono">IMEI: 35 928411 094820 1</span>
+          </div>
+        </div>
+
+        <!-- Warranty Badge -->
+        <div class="p-3 rounded-xl bg-cyber-cyan/10 border border-cyber-cyan/30 flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="award" class="w-4 h-4 text-cyber-cyan"></i>
+            <span class="font-bold text-white">Warranty Coverage: 1-Month Shop Replacement Warranty</span>
+          </div>
+          <span class="font-bold text-emerald-pass text-[10px]">CEIR NOC OK</span>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div class="space-y-2 text-xs border-t border-white/10 pt-4">
+          <div class="flex justify-between text-slate-300">
+            <span>Refurbished Handset Base:</span>
+            <span class="font-mono">₹64,999</span>
+          </div>
+          <div class="flex justify-between text-slate-300">
+            <span>Diagnostics & QC Certification:</span>
+            <span class="font-mono">+₹1,200</span>
+          </div>
+          <div class="flex justify-between text-emerald-pass">
+            <span>Festive Discount:</span>
+            <span class="font-mono">-₹1,000</span>
+          </div>
+          <div class="flex justify-between text-base font-extrabold text-white border-t border-white/10 pt-2">
+            <span>FINAL AMOUNT:</span>
+            <span class="text-cyber-cyan font-mono">₹65,199</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-3 pt-2">
+          <button onclick="shareWhatsApp()" class="flex-1 py-3 rounded-xl bg-[#25D366] text-[#0B0F19] text-xs font-black flex items-center justify-center space-x-2 hover:opacity-90">
+            <i data-lucide="share-2" class="w-4 h-4"></i>
+            <span>Send Bill via WhatsApp</span>
+          </button>
+          <button onclick="window.print()" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center space-x-2">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Print PDF</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Lucide Icons init
+    lucide.createIcons();
+
+    // Tab switcher
+    function switchTab(index) {
+      document.querySelectorAll('.tab-content').forEach((el, i) => {
+        el.classList.toggle('hidden', i !== index);
+      });
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        if (i === index) {
+          btn.className = 'tab-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 bg-gradient-to-r from-cyber-cyan to-azure-blue text-obsidian';
+        } else {
+          btn.className = 'tab-btn px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 bg-white/5 text-slate-300 hover:text-white';
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // Sample inventory
+    const inventory = [
+      { model: 'iPhone 14 Pro', storage: '256GB', imei: '359284110948201', buy: 54000, sale: 64999, status: 'In Stock', health: 96 },
+      { model: 'Samsung S23 Ultra', storage: '256GB', imei: '354921098471203', buy: 58000, sale: 69000, status: 'In Stock', health: 92 },
+      { model: 'OnePlus 11 5G', storage: '128GB', imei: '864192049182390', buy: 28000, sale: 34500, status: 'In Stock', health: 94 },
+      { model: 'iPhone 13', storage: '128GB', imei: '358102938475612', buy: 31000, sale: 39000, status: 'In Repair', health: 79 }
+    ];
+
+    function renderInventory() {
+      const container = document.getElementById('inventory-list-container');
+      container.innerHTML = inventory.map(item => `
+        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-cyber-cyan/30 transition-colors">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-white text-sm">${item.model} (${item.storage})</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${item.status === 'In Stock' ? 'bg-emerald-pass/20 text-emerald-pass' : 'bg-amber-warn/20 text-amber-warn'}">${item.status}</span>
+            </div>
+            <div class="text-xs text-slate-400 mt-1 font-mono">IMEI: ${item.imei} • Health: <span class="text-cyber-cyan font-bold">${item.health}%</span></div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="text-right">
+              <div class="text-xs text-slate-400">Target Price</div>
+              <div class="text-sm font-bold text-cyber-cyan font-mono">₹${item.sale.toLocaleString()}</div>
+            </div>
+            <button onclick="shareCatalog('${item.model}', ${item.sale})" class="px-3 py-1.5 rounded-lg bg-[#25D366] text-obsidian font-bold text-xs flex items-center space-x-1">
+              <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+              <span>WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+    renderInventory();
+
+    // 48 cells touch grid
+    const touchGridEl = document.getElementById('touch-grid');
+    let touchedCount = 0;
+    for (let i = 0; i < 48; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'bg-[#1E293B] rounded-lg transition-colors cursor-pointer';
+      cell.onmouseover = cell.ontouchstart = () => {
+        if (!cell.classList.contains('bg-cyber-cyan')) {
+          cell.className = 'bg-cyber-cyan shadow-[0_0_10px_#00F5D4] rounded-lg';
+          touchedCount++;
+          document.getElementById('touch-counter').innerText = `${touchedCount} / 48 (${Math.round((touchedCount/48)*100)}%)`;
+        }
+      };
+      touchGridEl.appendChild(cell);
+    }
+
+    function fillTouchGrid() {
+      touchGridEl.querySelectorAll('div').forEach(c => {
+        c.className = 'bg-cyber-cyan shadow-[0_0_10px_#00F5D4] rounded-lg';
+      });
+      touchedCount = 48;
+      document.getElementById('touch-counter').innerText = '48 / 48 (100%)';
+    }
+
+    function resetTouchGrid() {
+      touchGridEl.querySelectorAll('div').forEach(c => {
+        c.className = 'bg-[#1E293B] rounded-lg transition-colors cursor-pointer';
+      });
+      touchedCount = 0;
+      document.getElementById('touch-counter').innerText = '0 / 48 (0%)';
+    }
+
+    // Radar scan simulation
+    function runRadarScan() {
+      const btn = document.getElementById('btn-run-scan');
+      const text = document.getElementById('scan-status-text');
+      btn.disabled = true;
+      btn.innerText = 'Scanning Sensor Bus...';
+      const steps = ['Checking RF Modem...', 'Sampling Digitizer...', 'Reading Battery BMS...', 'Scan 100% Complete!'];
+      let stepIdx = 0;
+      const interval = setInterval(() => {
+        if (stepIdx < steps.length) {
+          text.innerText = steps[stepIdx];
+          stepIdx++;
+        } else {
+          clearInterval(interval);
+          btn.disabled = false;
+          btn.innerText = 'Scan Complete (Score: 92/100)';
+          fillTouchGrid();
+        }
+      }, 600);
+    }
+
+    // Dynamic valuation
+    function calculateValuation() {
+      const base = parseFloat(document.getElementById('val-model-select').value);
+      const mult = parseFloat(document.getElementById('val-storage-select').value);
+      const adjustedBase = base * mult;
+      let deductions = 0;
+      if (document.getElementById('defect-screen').checked) deductions += 3500;
+      if (document.getElementById('defect-battery').checked) deductions += 1200;
+      if (document.getElementById('defect-back').checked) deductions += 700;
+      if (document.getElementById('defect-box').checked) deductions += 500;
+
+      const resale = adjustedBase - deductions;
+      const repair = 1800;
+      const profit = 3000;
+      const offer = resale - repair - profit;
+
+      document.getElementById('out-base-val').innerText = '₹' + Math.round(adjustedBase).toLocaleString();
+      document.getElementById('out-deductions').innerText = '-₹' + deductions.toLocaleString();
+      document.getElementById('out-resale').innerText = '₹' + Math.round(resale).toLocaleString();
+      document.getElementById('out-buy-offer').innerText = '₹' + Math.round(offer).toLocaleString();
+    }
+    calculateValuation();
+
+    // Canvas signature pad
+    const canvas = document.getElementById('signature-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let drawing = false;
+      ctx.strokeStyle = '#00F5D4';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+
+      function getPos(e) {
+        const r = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - r.left, y: clientY - r.top };
+      }
+
+      canvas.onmousedown = canvas.ontouchstart = (e) => {
+        drawing = true;
+        const p = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+      };
+      canvas.onmousemove = canvas.ontouchmove = (e) => {
+        if (!drawing) return;
+        const p = getPos(e);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      };
+      window.onmouseup = window.ontouchend = () => drawing = false;
+    }
+
+    function clearSignatureCanvas() {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function exportInventoryCsv() {
+      let csv = "Brand,Model,IMEI,TargetPrice\n";
+      inventory.forEach(i => csv += `Apple,${i.model},${i.imei},${i.sale}\n`);
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "PhoneKhoj_Inventory.csv";
+      a.click();
+    }
+
+    function shareWhatsApp() {
+      const text = encodeURIComponent("🧾 *PhoneKhoj Digital Invoice #PK-2026-9042*\nDevice: iPhone 14 Pro 256GB\nIMEI: 35 928411 094820 1\nWarranty: 1-Month Shop Warranty\nTotal: ₹65,199\nThank you!");
+      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+    }
+
+    function shareCatalog(model, price) {
+      const text = encodeURIComponent(`📱 *Available at Apex Mobile Hub:*\n${model}\nSpecial Price: ₹${price}\n1-Month Shop Warranty + CEIR Verified!`);
+      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+    }
+  </script>
+</body>
+</html>
